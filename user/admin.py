@@ -7,19 +7,19 @@ from .models import CustomUser, AccountUser
 @register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
     model = CustomUser
-    list_display = ('username', 'phone_number', 'is_staff', 'is_active')
+    list_display = ('username', 'phoneNumber', 'is_staff', 'is_active')
     list_filter = ('is_staff', 'is_active')
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'phone_number')}),
+        (None, {'fields': ('username', 'password', 'phoneNumber')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2', 'phone_number', 'is_staff', 'is_active')}
+            'fields': ('username', 'password1', 'password2', 'phoneNumber', 'is_staff', 'is_active')}
          ),
     )
-    search_fields = ('username', 'phone_number')
+    search_fields = ('username', 'phoneNumber')
     ordering = ('username',)
 
 
