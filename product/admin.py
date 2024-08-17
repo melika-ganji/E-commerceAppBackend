@@ -30,7 +30,7 @@ class ProductAttributeValueAdmin(admin.ModelAdmin):
 @register(ProductAttribute)
 class ProductAttributeAdmin(admin.ModelAdmin):
     model = ProductAttribute
-    list_display = ('productType', 'name')
+    list_display = ('id', 'productType', 'name')
     search_fields = ('name',)
     ordering = ('productType',)
 
@@ -38,7 +38,7 @@ class ProductAttributeAdmin(admin.ModelAdmin):
 @register(ProductType)
 class ProductTypeAdmin(admin.ModelAdmin):
     model = ProductType
-    list_display = ('name',)
+    list_display = ('id', 'name',)
     search_fields = ('name',)
     ordering = ('name',)
 

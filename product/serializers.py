@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from product.models import Brand, Category, ProductType
+from product.models import Brand, Category, ProductType, Product, ProductAttribute
 
 
 class SimpleBrandSerializer(serializers.ModelSerializer):
@@ -77,3 +77,25 @@ class ProductTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductType
         fields = '__all__'
+
+
+class ProductAttributeSerializer(serializers.ModelSerializer):
+    productTypeName = serializers.CharField(write_only=True, required=True)
+    productType = ProductTypeSerializer(read_only=True)
+
+    class Meta:
+        model = ProductAttribute
+        fields = '__all__'
+
+    def create(self, validated_data):
+        productTypeName = validated_data.pop('productTypeName', None)
+        if productTypeName:
+            productType = ProductType.objects.filter(name=productTypeName).first()
+            if productType:
+                validated_data['productType'] = productType
+            else:
+                raise serializers.ValidationError({f'{productTypeName}': 'Product Type with this name does not exist.'})
+        print(validated_data)
+        return super().create(validated_data)
+
+

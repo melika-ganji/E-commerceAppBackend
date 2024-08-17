@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from product.models import  Brand, Category, ProductType
-from product.serializers import BrandSerializer, CategorySerializer, ProductTypeSerializer
+from product.models import Brand, Category, ProductType, ProductAttribute
+from product.serializers import BrandSerializer, CategorySerializer, ProductTypeSerializer, ProductAttributeSerializer
 
 
 class BrandApiView(ListAPIView):
@@ -99,8 +99,41 @@ class CreateProductTypeApiView(ListCreateAPIView):
         data = {'name': request.data.get('name')}
 
         serializer = ProductTypeSerializer(data=data)
-        print(serializer)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductAttributeApiView(ListAPIView):
+    serializer_class = ProductAttributeSerializer
+    authentication_classes = ([])
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return ProductAttribute.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        attribute = get_object_or_404(ProductAttribute, pk=kwargs['pk'])
+        serializer = ProductAttributeSerializer(attribute)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateProductAttributeApiView(ListCreateAPIView):
+    serializer_class = ProductAttributeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = ProductAttribute.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        data = {
+            'name': request.data.get('name'),
+            'productTypeName': request.data.get('productType')
+        }
+
+        serializer = self.get_serializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
+
