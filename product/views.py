@@ -4,8 +4,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from product.models import Brand, Category, ProductType, ProductAttribute
-from product.serializers import BrandSerializer, CategorySerializer, ProductTypeSerializer, ProductAttributeSerializer
+from product.models import Brand, Category, ProductType, ProductAttribute, Product, ProductAttributeValue
+from product.serializers import BrandSerializer, CategorySerializer, ProductTypeSerializer, ProductAttributeSerializer, \
+    ProductSerializer, ProductAttributeValueSerializer
 
 
 class BrandApiView(ListAPIView):
@@ -137,3 +138,71 @@ class CreateProductAttributeApiView(ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ProductApiView(ListAPIView):
+    serializer_class = ProductSerializer
+    authentication_classes = ([])
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return Product.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        product = get_object_or_404(Product, pk=kwargs['pk'])
+        serializer = ProductSerializer(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateProductApiView(ListCreateAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Product.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        data = {
+            'name': request.data.get('name'),
+            'productTypeName': request.data.get('productType'),
+            'upc': request.data.get('upc'),
+            'brandName': request.data.get('brand'),
+            'categoryName': request.data.get('category'),
+            'description': request.data.get('description'),
+            'price': request.data.get('price')
+        }
+
+        serializer = ProductSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductAttributeValueApiView(ListAPIView):
+    serializer_class = ProductAttributeValueSerializer
+    authentication_classes = ([])
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return ProductAttributeValue.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        productAttributeValue = get_object_or_404(ProductAttributeValue, pk=kwargs['pk'])
+        serializer = ProductAttributeValueSerializer(productAttributeValue)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateProductAttributeValueApiView(ListCreateAPIView):
+    serializer_class = ProductAttributeValueSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = ProductAttributeValue.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        data = {
+            'value': request.data.get('value'),
+            'productAttributeName': request.data.get('productAttribute'),
+            'productName': request.data.get('product')
+        }
+
+        serializer = ProductAttributeValueSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

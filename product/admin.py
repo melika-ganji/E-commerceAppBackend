@@ -7,7 +7,7 @@ from product.models import Product, ProductAttributeValue, ProductAttribute, Pro
 @register(Product)
 class ProductAdmin(admin.ModelAdmin):
     model = Product
-    list_display = ('name', 'get_productType_id', 'upc', 'brand', 'category', 'price', 'description')
+    list_display = ('id', 'name', 'get_productType_id', 'upc', 'brand', 'category', 'price', 'description')
     list_filter = ('productType', 'upc', 'brand', 'category')
 
     search_fields = ('upc',)
@@ -22,7 +22,7 @@ class ProductAdmin(admin.ModelAdmin):
 @register(ProductAttributeValue)
 class ProductAttributeValueAdmin(admin.ModelAdmin):
     model = ProductAttributeValue
-    list_display = ('product', 'productAttribute', 'value')
+    list_display = ('id', 'product', 'productAttribute', 'value')
     search_fields = ('value',)
     ordering = ('product',)
 

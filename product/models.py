@@ -35,11 +35,11 @@ class ProductAttribute(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=30)
     productType = models.ForeignKey(ProductType, on_delete=models.CASCADE, related_name='products')
-    upc = models.IntegerField()
+    upc = models.CharField(max_length=12)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='products')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     description = models.TextField(blank=True)
-    price = models.IntegerField()
+    price = models.FloatField()
 
 
 class ProductAttributeValue(models.Model):

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from product.models import Brand, Category, ProductType, Product, ProductAttribute
+from product.models import Brand, Category, ProductType, Product, ProductAttribute, ProductAttributeValue
 
 
 class SimpleBrandSerializer(serializers.ModelSerializer):
@@ -95,7 +95,73 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
                 validated_data['productType'] = productType
             else:
                 raise serializers.ValidationError({f'{productTypeName}': 'Product Type with this name does not exist.'})
-        print(validated_data)
         return super().create(validated_data)
 
 
+class ProductSerializer(serializers.ModelSerializer):
+    productTypeName = serializers.CharField(write_only=True, required=True)
+    productType = ProductTypeSerializer(read_only=True)
+    brandName = serializers.CharField(write_only=True, required=True)
+    brand = BrandSerializer(read_only=True)
+    categoryName = serializers.CharField(write_only=True, required=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+    def create(self, validated_data):
+        productTypeName = validated_data.pop('productTypeName', None)
+        if productTypeName:
+            productType = ProductType.objects.filter(name=productTypeName).first()
+            if productType:
+                validated_data['productType'] = productType
+            else:
+                raise serializers.ValidationError({f'{productTypeName}': 'Product Type with this name does not exist.'})
+
+        brandName = validated_data.pop('brandName', None)
+        if brandName:
+            brand = Brand.objects.filter(name=brandName).first()
+            if brand:
+                validated_data['brand'] = brand
+            else:
+                raise serializers.ValidationError({f'{productTypeName}': 'Brand with this name does not exist.'})
+
+        categoryName = validated_data.pop('categoryName', None)
+        if categoryName:
+            category = Category.objects.filter(name=categoryName).first()
+            if category:
+                validated_data['category'] = category
+            else:
+                raise serializers.ValidationError({f'{productTypeName}': 'Category with this name does not exist.'})
+        return super().create(validated_data)
+
+
+class ProductAttributeValueSerializer(serializers.ModelSerializer):
+    productAttributeName = serializers.CharField(write_only=True, required=True)
+    productAttribute = ProductAttributeSerializer(read_only=True)
+    productName = serializers.CharField(write_only=True, required=True)
+    product = ProductSerializer(read_only=True)
+
+    class Meta:
+        model = ProductAttributeValue
+        fields = '__all__'
+
+    def create(self, validated_data):
+        productName = validated_data.pop('productName', None)
+        if productName:
+            product = Product.objects.filter(name=productName).first()
+            if product:
+                validated_data['product'] = product
+            else:
+                raise serializers.ValidationError({f'{productName}': 'Product with this name does not exist.'})
+
+        productAttributeName = validated_data.pop('productAttributeName', None)
+        if productAttributeName:
+            productAttribute = ProductAttribute.objects.filter(name=productAttributeName).first()
+            if productAttribute:
+                validated_data['productAttribute'] = productAttribute
+            else:
+                raise serializers.ValidationError(
+                    {f'{productAttributeName}': 'Product attribute with this name does not exist.'})
+        return super().create(validated_data)
