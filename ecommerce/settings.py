@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 
     'user.apps.UserConfig',
     'product.apps.ProductConfig',
+    'order.apps.OrderConfig',
 
     'rest_framework',
     'rest_framework_simplejwt',
